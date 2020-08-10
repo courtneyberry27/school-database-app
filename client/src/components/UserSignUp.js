@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 
-class UserSignUp extends Component {
+export default class UserSignUp extends Component {
 
   state = {
     firstName: '',
@@ -124,5 +124,3 @@ class UserSignUp extends Component {
     this.props.history.push('/');
   };
 };
-
-module.exports = UserSignUp;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-class CourseDetail extends Component {
+export default class CourseDetail extends Component {
     state = {
         courseDetails: {}, 
         user: {},
@@ -103,5 +103,3 @@ class CourseDetail extends Component {
         );
     }
 };
-
-module.exports = CourseDetail;

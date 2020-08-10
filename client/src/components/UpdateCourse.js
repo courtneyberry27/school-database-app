@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class UpdateCourse extends Component {
+export default class UpdateCourse extends Component {
   state = {
     courseId: '',
     title: '',
@@ -184,5 +184,3 @@ class UpdateCourse extends Component {
     this.props.history.push(`/courses/${id}`);
   };
 };
-
-module.exports = UpdateCourse;

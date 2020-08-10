@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class CreateCourse extends Component {
+export default class CreateCourse extends Component {
   state = {
     title: '',
     description: '',
@@ -131,7 +131,7 @@ class CreateCourse extends Component {
         [name]: value
       };
     });
-  }
+  };
 
 /**************************
 * CANCEL FUNCTION
@@ -139,7 +139,5 @@ class CreateCourse extends Component {
   cancel = (e) => {
     e.preventDefault();
     this.props.history.push('/');
-  }
-}
-
-module.exports = CreateCourse;
+  };
+};
