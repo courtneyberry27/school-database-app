@@ -282,7 +282,6 @@ h1 {
 
 /* line 61, ../sass/global.sass */
 a {
-  color: white;
   cursor: pointer;
   text-decoration: none;
   -webkit-transition: color 0.2s;
@@ -679,7 +678,7 @@ input:focus {
 /* line 507, ../sass/global.sass */
 .button {
   background: #7c689b;
-  color: #fff;
+  color: white;
   font-family: "Work Sans", sans-serif;
   font-size: 18px;
   padding: 15px 30px;

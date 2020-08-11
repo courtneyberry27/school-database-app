@@ -54,34 +54,32 @@ router.post('/users', [
         .exists()
         .withMessage("Please provide value for 'password'")
 ],asyncHandler(async(req, res) => { 
-    try {
-        const errors = validationResult(req);
+    const errors = validationResult(req);
+    const user = req.body;
 
-        if (!errors.isEmpty()) {
-            const errorMessages = errors.array().map(error => error.msg);
+    if (!errors.isEmpty()) {
+        const errorMessages = errors.array().map(error => error.msg);
     
-            return res.status(400).json({ errors: errorMessages });
-        }
+        return res.status(400).json({ errors: errorMessages });
+    }
 
-        //RETRIEVE USER FROM REQUEST BODY
-        const user = req.body;
 
-        //VALIDATE EMAIL IS UNIQUE
-        const uniqueEmail = await middleware.isUniqueEmail(user)
-        if(!uniqueEmail) {
-            return res.status(400).json({ error: "Email already in use. please provide a unique email." });
-        }
+    //VALIDATE EMAIL IS UNIQUE
+    const uniqueEmail = await middleware.isUniqueEmail(user)
+    if(!uniqueEmail) {
+        return res.status(400).json({ error: "Email already in use. please provide a unique email." });
+    }
 
-        //HASH PASSWORD
-        user.password = bcryptjs.hashSync(user.password);
-
+    //HASH PASSWORD
+    user.password = bcryptjs.hashSync(user.password);
+    try {
         //ADD USER TO DATABASE
-        const newUser = await User.create(user);
+        await User.create(user);
 
         //STATSUS 201 OR 400
         res.status(201).location(`/`).end();
     } catch (error) {
-        if (error.name === 'SequelizeValidationError') {
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
             res.status(400).location('/').json({error: error.errors[0].message})
         } else {
             throw error
@@ -157,6 +155,7 @@ router.post("/courses", [
 
 }));
 
+//UPDATE COURSES
 router.put('/courses/:id', [
     check("title")
       .exists({ checkNull: true, checkFalsy: true })

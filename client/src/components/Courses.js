@@ -28,7 +28,7 @@ export default class Courses extends Component {
         />
       );
     } else {
-    courses = <Notfound />
+      courses = <Notfound />
     }
 
     return(

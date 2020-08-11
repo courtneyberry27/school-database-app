@@ -10,42 +10,60 @@ export default class UserSignIn extends Component {
 
   render() {
     const {
-      emailAddress,
+      email,
       password,
-      errors,  
+      errors,
     } = this.state;
 
+    let validation = null;
+    if (errors.length > 0) {
+      validation = (
+        <div className="container-error" role="alert">
+          <h2>Validation errors</h2>
+          <p>{errors}</p>
+        </div>
+      );
+    }
+
     return (
-      <div className="bounds">
-        <div className="grid-33 centered signin">
+      <div className="center-content">
+        <div className="container-form-user">
           <h1>Sign In</h1>
-          <div>
-            {errors.length ? 
-              <React.Fragment>
-                <h2 className="validation--errors--label">Validation errors</h2>
-                <div className="validation-errors">
-                  <ul>
-                    {errors.map((err, index) =>
-                      <li key={index}>{err}</li>
-                    )}
-                  </ul> 
-                </div>
-              </React.Fragment>
-            : 
-            <hr />
-            }
-            <form onSubmit={this.submit}>
-              <div><input onChange={this.change} id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" value={emailAddress} /></div>
-              <div><input onChange={this.change} id="password" name="password" type="password" className="" placeholder="Password" value={password} /></div>
-              <div className="grid-100 pad-bottom"><button className="button" type="submit">Sign In</button><button className="button button-secondary" onClick={this.cancel}>Cancel</button></div>
-            </form>
-          </div>
-          <p>&nbsp;</p>
-          <p>Don't have a user account? <Link to="/signup">Click here</Link> to sign up!</p>
+          {validation}
+          <form onSubmit={this.submit}>
+            <label htmlFor="email">Email / Username</label>
+            <input 
+              id="email" 
+              name="email" 
+              type="text"
+              value={email}
+              aria-required="true"
+              onChange={this.change} 
+              placeholder="Email / Username"
+              autoComplete="username"
+              autoFocus />
+            <label htmlFor="password">Password</label>
+            <input 
+              id="password" 
+              name="password"
+              type="password"
+              value={password}
+              aria-required="true"
+              onChange={this.change} 
+              placeholder="Password"
+              autoComplete="current-password" />                
+            <div className="container-buttons">
+              <button type="submit">Sign In</button>
+              <button className="button-nav" onClick={this.cancel}>Cancel</button>
+            </div>
+          </form>
+          <p>
+            Don't have a user account? <Link to="/signup">Click here</Link> to sign up!
+          </p>
         </div>
       </div>
     );
-  };
+  }
 
 /***************************
 * CHANGE SIGN IN FUNCTION
