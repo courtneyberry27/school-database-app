@@ -1,9 +1,10 @@
 //IMPORTS
-import React from 'react';
+import React, { Component } from 'react';
 import { 
   BrowserRouter,
   Route,
-  Switch
+  Switch, 
+  Redirect
 } from 'react-router-dom';
 
 //FILE IMPORTS
@@ -21,38 +22,54 @@ import UnhandledError from './components/UnhandledError'
 import Forbidden from './components/Forbidden'
 
 //WITH CONTEXT IMPORT
-import withContext from './Context';
+import { AuthProvider } from './Context';
 
-//USE WITH CONTEXT FOR ALL COMPONENTS (WithContext = "WITH CONTEXT")
-const HeaderWithContext = withContext(Header);
-const CoursesWithContext = withContext(Courses);
-const UserSignInWithContext = withContext(UserSignIn);
-const UserSignUpWithContext = withContext(UserSignUp);
-const UserSignOutWithContext = withContext(UserSignOut);
-const CourseDetailWithContext = withContext(CourseDetail);
-const CreateCourseWithContext = withContext(CreateCourse);
-const UpdateCourseWithContext = withContext(UpdateCourse);
+// //USE WITH CONTEXT FOR ALL COMPONENTS (WithContext = "WITH CONTEXT")
+// const HeaderWithContext = withContext(Header);
+// const CoursesWithContext = withContext(Courses);
+// const UserSignInWithContext = withContext(UserSignIn);
+// const UserSignUpWithContext = withContext(UserSignUp);
+// const UserSignOutWithContext = withContext(UserSignOut);
+// const CourseDetailWithContext = withContext(CourseDetail);
+// const CreateCourseWithContext = withContext(CreateCourse);
+// const UpdateCourseWithContext = withContext(UpdateCourse);
 
 /*************************
  * ROUTES SECTION
  *************************/
-export default () => (
-  <BrowserRouter>
-  <HeaderWithContext />
-  <main>
-    <Switch>
-      <Route exact path="/" component={CoursesWithContext} />
-      <Route path="/signup" component={UserSignUpWithContext} />
-      <Route path="/signin" component={UserSignInWithContext} />
-      <Route path="/signout" component={UserSignOutWithContext} />
-      <PrivateRoute exact path="/courses/create" component={CreateCourseWithContext} />
-      <PrivateRoute path={`/courses/:id/update`} component={UpdateCourseWithContext} />
-      <Route path="/courses/:id" component={CourseDetailWithContext} />
-      <Route path="/notfound" component={NotFound} />
-      <Route path="/forbidden" component={Forbidden} />
-      <Route path="/error" component={UnhandledError} />
-      <Route component={NotFound} />
-    </Switch>
-  </main>
-</BrowserRouter>
-);
+class App extends Component {
+  render() {
+    return (
+      <div className="root">
+        <div>
+          <AuthProvider>
+            <Header />
+            <Switch>
+              <Route exact path="/" component={Courses} />
+              <PrivateRoute
+                exact
+                path="/courses/:id/update"
+                component={UpdateCourse}
+              />
+              <PrivateRoute
+                exact
+                path="/courses/create"
+                component={CreateCourse}
+              />
+              <Route exact path="/courses/:id" component={CourseDetail} />
+              <Route exact path="/signin" component={UserSignIn} />
+              <Route exact path="/signup" component={UserSignUp} />
+              <Route exact path="/signout" component={UserSignOut} />
+              <Route exact path="/forbidden" component={Forbidden} />
+              <Route exact path="/notfound" component={NotFound} />
+              <Route exact path="/error" component={UnhandledError} />
+              <Route render={() => <Redirect to="/notfound" />} />
+            </Switch>
+          </AuthProvider>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;

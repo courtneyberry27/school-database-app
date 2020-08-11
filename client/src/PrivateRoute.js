@@ -1,24 +1,32 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { Consumer } from './Context';
 
-export default ({ component: Component, ...rest }) => {
+import { AuthConsumer } from './Context';
+
+// Used for CreateCourse and UpdateCourse. Redirects to SignIn if user not logged in.
+// Redirects back to the last page visited after signing in.
+const PrivateRoute = ({ component: Component, ...rest }) => {
   return (
-    <Consumer>
-      { context => (
+    <AuthConsumer>
+      {({ isAuth }) => (
         <Route
-          {...rest}
-          render={props => context.authenticatedUser ? (
+          render={props =>
+            isAuth ? (
               <Component {...props} />
             ) : (
-              <Redirect to={{
-                pathname: '/signin',
-                state: {from: props.location}
-              }} />
+              <Redirect
+                to={{
+                  pathname: '/signin',
+                  state: { from: props.location }
+                }}
+              />
             )
           }
+          {...rest}
         />
-      )};
-    </Consumer>
+      )}
+    </AuthConsumer>
   );
 };
+
+export default PrivateRoute;

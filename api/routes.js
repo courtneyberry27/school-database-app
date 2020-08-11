@@ -75,9 +75,11 @@ router.post('/users', [
     try {
         //ADD USER TO DATABASE
         await User.create(user);
-
+        res.render('/');
+        //LOCATION
+        res.location(`/`);
         //STATSUS 201 OR 400
-        res.status(201).location(`/`).end();
+        res.status(201).end();
     } catch (error) {
         if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
             res.status(400).location('/').json({error: error.errors[0].message})

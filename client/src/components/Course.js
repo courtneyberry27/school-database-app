@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { NavLink } from 'react-router-dom';
 
-const Course = ({title, url}) => {
-  return(
-        <div className="grid-33">
-          <a className="course--module course--link" href={url}>
-            <h4 className="course--label">Course</h4>
-            <h3 className="course--title">{title}</h3>
-          </a>
-    </div>
-  )
+import { AuthConsumer } from '../Context';
+
+// Individual course buttons on the courses route. Reroutes to the CourseDetail page when clicked.
+// Also calls isCourseOwner in the Provider for use in ActionsBar to display the update and delete buttons.
+class Course extends Component {
+  render() {
+    const { id, title, courseUserId } = this.props;
+
+    return (
+      <AuthConsumer>
+        {({ isCourseOwner }) => (
+          <div className="grid-33">
+            <NavLink
+              to={`courses/${id}`}
+              className="course--module course--link"
+              onClick={isCourseOwner(courseUserId)}
+            >
+              <h4 className="course--label">Course</h4>
+              <h3 className="course--title">{title}</h3>
+            </NavLink>
+          </div>
+        )}
+      </AuthConsumer>
+    );
+  }
 }
 
-export default Course;
+export default React.memo(Course);

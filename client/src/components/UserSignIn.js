@@ -1,115 +1,73 @@
-import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react';
+import { NavLink, Redirect } from 'react-router-dom';
+import { Spring } from 'react-spring/renderprops';
 
-export default class UserSignIn extends Component {
-  state = {
-    emailAddress: '',
-    password: '',
-    errors: [],
-  };
+import { AuthConsumer } from '../Context';
 
+// All handled in AuthContext. Will send user to the CreateCourse or UpdateCourse if they clicked on that before they were redirected to the SignIn page.
+class UserSignIn extends Component {
   render() {
-    const {
-      email,
-      password,
-      errors,
-    } = this.state;
-
-    let validation = null;
-    if (errors.length > 0) {
-      validation = (
-        <div className="container-error" role="alert">
-          <h2>Validation errors</h2>
-          <p>{errors}</p>
-        </div>
-      );
-    }
+    const { from } = this.props.location.state || { from: { pathname: '/' } };
 
     return (
-      <div className="center-content">
-        <div className="container-form-user">
-          <h1>Sign In</h1>
-          {validation}
-          <form onSubmit={this.submit}>
-            <label htmlFor="email">Email / Username</label>
-            <input 
-              id="email" 
-              name="email" 
-              type="text"
-              value={email}
-              aria-required="true"
-              onChange={this.change} 
-              placeholder="Email / Username"
-              autoComplete="username"
-              autoFocus />
-            <label htmlFor="password">Password</label>
-            <input 
-              id="password" 
-              name="password"
-              type="password"
-              value={password}
-              aria-required="true"
-              onChange={this.change} 
-              placeholder="Password"
-              autoComplete="current-password" />                
-            <div className="container-buttons">
-              <button type="submit">Sign In</button>
-              <button className="button-nav" onClick={this.cancel}>Cancel</button>
-            </div>
-          </form>
-          <p>
-            Don't have a user account? <Link to="/signup">Click here</Link> to sign up!
-          </p>
-        </div>
-      </div>
+      <AuthConsumer>
+        {({ isAuth, handleChange, signIn }) =>
+          isAuth ? (
+            <Redirect to={from} />
+          ) : (
+            <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
+              {props => (
+                <div className="bounds" style={props}>
+                  <div className="grid-33 centered signin">
+                    <h1>Sign In</h1>
+                    <div>
+                      <form onSubmit={signIn}>
+                        <div>
+                          <input
+                            id="emailAddress"
+                            name="emailAddress"
+                            type="text"
+                            className=""
+                            autoComplete="username"
+                            placeholder="Email Address"
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            className=""
+                            autoComplete="current-password"
+                            placeholder="Password"
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="grid-100 pad-bottom">
+                          <button className="button" type="submit">
+                            Sign In
+                          </button>
+                          <NavLink className="button button-secondary" to="/">
+                            Cancel
+                          </NavLink>
+                        </div>
+                      </form>
+                    </div>
+                    <p>&nbsp;</p>
+                    <p>
+                      Don't have a user account?
+                      <NavLink to="/signup"> Click here</NavLink> to sign up!
+                    </p>
+                  </div>
+                </div>
+              )}
+            </Spring>
+          )
+        }
+      </AuthConsumer>
     );
   }
+}
 
-/***************************
-* CHANGE SIGN IN FUNCTION
-****************************/
-  change = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    this.setState(() => {
-      return {
-        [name]: value
-      };
-    });
-  };
-
-/***************************
-* SUBMIT SIGN IN FUNCTION
-****************************/
-  submit = (e) => {
-    e.preventDefault();
-    const { context } = this.props;
-    const { from } = this.props.location.state || { from: { pathname: '/' } }; //this.props.location.state is set in PrivateRoute.js
-    const { emailAddress, password } = this.state;
-
-    context.actions.signIn(emailAddress, password)
-      .then( user => {
-        if (user.status === 200) {
-          this.props.history.push(from);
-          console.log(`${emailAddress} is signed in!`);
-        } else if (user.status === 401) {
-          this.setState(() => {
-          return { errors: user.errors };
-          });
-        };
-      })
-      .catch( err => {
-        console.log(err);
-        this.props.history.push('/error');
-      });
-  };
-
-/***************************
-* CANCEL SIGN IN FUNCTION
-****************************/
-  cancel = (e) => {
-    e.preventDefault();
-    this.props.history.push('/');
-  };
-};
+export default UserSignIn;

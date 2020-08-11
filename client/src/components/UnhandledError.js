@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link }from 'react-router-dom';
 
-const UnhandledError = () => {
+export default () => {
   return(
     <div className="bounds">
       <h1>Error</h1>
-      <p>We are sorry, an unexpected Error has occurred!</p>
+      <p>We are sorry, an unexpected error has occurred!</p>
       <div className="button">
         <Link to="/">Return Home</Link>
       </div>
@@ -13,4 +13,3 @@ const UnhandledError = () => {
   );
 };
 
-export default UnhandledError;

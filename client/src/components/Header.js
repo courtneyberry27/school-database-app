@@ -1,29 +1,44 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
-export default ({context}) => {
+import { AuthConsumer } from '../Context';
 
+// Contains the Sign In/Up/Out. Changes from Up to Out and displays user's name when signed in.
+const Header = () => {
   return (
-    <React.Fragment>
-      <div className="header">
-        <div className="bounds">
-          <Link className="header--logo" to='/'>Courses</Link>
-          <nav>
-            {context.authenticatedUser ?
-              <React.Fragment>
-                <span>Welcome, {context.authenticatedUser.firstName}!</span>
-                <Link className="signout" to="/signout">Sign Out</Link>
-              </React.Fragment>
-            :    
-              <React.Fragment>
-                <Link className="signup" to="/signup">Sign Up</Link>
-                <Link className="signin" to="/signin">Sign In</Link>
-              </React.Fragment>
-            }
-          </nav>
+    <AuthConsumer>
+      {({ isAuth, name, signOut }) => (
+        <div className="header">
+          <div className="bounds">
+            <NavLink to="/">
+              <h1 className="header--logo">Courses</h1>
+            </NavLink>
+            <nav>
+              {isAuth ? (
+                <div>
+                  <NavLink className="signin" to="signin">
+                    {`Welcome, ${name}`}
+                  </NavLink>
+                  <NavLink className="signout" to="/signout" onClick={signOut}>
+                    Sign Out
+                  </NavLink>
+                </div>
+              ) : (
+                <div>
+                  <NavLink className="signin" to="../signin">
+                    Sign In
+                  </NavLink>
+                  <NavLink className="signup" to="../signup">
+                    Sign Up
+                  </NavLink>
+                </div>
+              )}
+            </nav>
+          </div>
         </div>
-      </div>
-      <hr />
-    </React.Fragment>
+      )}
+    </AuthConsumer>
   );
 };
+
+export default Header;
