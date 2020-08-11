@@ -1,71 +1,78 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
-
+import Markdown from 'react-markdown';
 export default class CourseDetail extends Component {
-    state = {
-        courseDetails: {}, 
-        user: {},
-        materials: []
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: '',
+      description: '',
+      estimatedTime: '',
+      materialsNeeded: '',
+      user: '',
+      authenticatedUser: '',
+      courseId: ''
+    };
+  };
 
-    componentDidMount() {
-        const { context } = this.props;
-        const { id } = this.props.match.params;
+    async componentDidMount() {
+      const { context } = this.props;
+      const { id } = this.props.match.params;
 
-        context.data.getCourseDetails(id) 
-            .then(res => {
-                if (res) {
-                    let materials = res.course.materialsNeeded;
-                    
-                    if (materials !== null) {
-                        materials = materials.split('\n');
-                    } else {
-                        materials = [];
-                    };
-
-                    this.setState({
-                        courseDetails: res.course,
-                        user: res.course.user,
-                        materials: materials,
-                        authenticatedUser: context.authenticatedUser
-                    });
-                } else {
-                    this.props.history.push('/notfound');
-                };
-            })
-            .catch(err => {
-                console.log(err);
-                this.props.history.push('/error');
-            });
+      context.data.courseDetail(id)
+      .then(response => {
+        this.setState({
+          title: response.title,
+          description: response.description,
+          estimatedTime: response.estimatedTime,
+          materialsNeeded: response.materialsNeeded,
+          user: response.user,
+          authenticatedUser: context.authenticatedUser,
+          courseId: id
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        this.props.history.push("/error");
+      });
     };
 
     render() {
-        const {
-            courseDetails,
-            user,
-            materials,
-            authenticatedUser
-        } = this.state;
-
-        return(
-            <div>
-            <div className="actions--bar">
+      const {
+        title,
+        courseId,
+        authenticatedUser,
+        user
+      } = this.state
+      
+      return (
+        <div>
+          <div className="actions--bar">
             <div className="bounds">
               <div className="grid-100">
-                <span>
-                  {authenticatedUser ?
-                    authenticatedUser.emailAddress === user.emailAddress ?
-                      <React.Fragment>
-                        <Link className="button" to={`/courses/${courseDetails.id}/update`}>Update Course</Link>
-                        <Link className="button" to={`/courses/delete/${courseDetails.id}`}>Delete Course</Link>
-                      </React.Fragment>
-                      :
+              <span>
+                  {authenticatedUser ? ( authenticatedUser.emailAddress === user.emailAddress ? (
+                      <Fragment>
+                        <Link
+                          className="button"
+                          to={`/courses/${courseId}/update`}>
+                          Update Course
+                        </Link>
+                        <Link
+                          className="button"
+                          onClick={this.deleteCourse}
+                          to={`/courses/delete/${courseId}`}>
+                          Delete Course
+                        </Link>
+                      </Fragment>
+                    ) : (
                       <hr />
-                    :
+                    )
+                  ) : (
                     <hr />
-                  }
+                  )}
                 </span>
-                <Link className="button button-secondary" to="/">Return to List</Link>
+                <a className="button button-secondary" href="/">Return to List</a>
               </div>
             </div>
           </div>
@@ -73,11 +80,11 @@ export default class CourseDetail extends Component {
             <div className="grid-66">
               <div className="course--header">
                 <h4 className="course--label">Course</h4>
-                <h3 className="course--title">{courseDetails.title}</h3>
-                <p> By {user.firstName} {user.lastName}</p>
+                <h3 className="course--title">{title}</h3>
+                <p>By {this.state.user.firstName} {this.state.user.lastName}</p>
               </div>
               <div className="course--description">
-                <p>{courseDetails.description}</p>
+                <Markdown source={this.state.description} />
               </div>
             </div>
             <div className="grid-25 grid-right">
@@ -85,14 +92,14 @@ export default class CourseDetail extends Component {
                 <ul className="course--stats--list">
                   <li className="course--stats--list--item">
                     <h4>Estimated Time</h4>
-                    <h3>{courseDetails.estimatedTime}</h3>
+                    <h3>{this.state.estimatedTime}</h3>
                   </li>
                   <li className="course--stats--list--item">
                     <h4>Materials Needed</h4>
                     <ul>
-                      {materials.map(material => 
-                        <li key={material}>{material}</li>
-                      )}
+                      <li>
+                        <Markdown source={this.state.materialsNeeded} />
+                      </li>
                     </ul>
                   </li>
                 </ul>
@@ -100,6 +107,6 @@ export default class CourseDetail extends Component {
             </div>
           </div>
         </div>
-        );
+      )
     }
-};
+}

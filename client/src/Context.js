@@ -6,26 +6,26 @@ const Context = React.createContext();
 
 export class Provider extends Component {
 
+  state = {
+    authenticatedUser: Cookies.getJSON('authenticatedUser') || null,
+    password: Cookies.getJSON('password') || null
+  };
+
   constructor() {
     super();
     this.data = new Data();
-  };
-
-  state = {
-    //COOKIES AUTH
-    authenticatedUser: Cookies.getJSON('authenticatedUser') || null
-  };
+  }
 
   render() {
-    const { authenticatedUser } = this.state;
+    const { authenticatedUser, password } = this.state;
 
     const value = {
       authenticatedUser,
+      password,
       data: this.data,
       actions: {
         signIn: this.signIn,
-        signOut: this.signOut,
-        parseValidationErrors: this.parseValidationErrors
+        signOut: this.signOut
       }
     }
 
@@ -39,41 +39,33 @@ export class Provider extends Component {
 /*****************************
  * SIGN IN FUNCTION
  *****************************/
-  signIn = async (username, password) => {
-    let user = await this.data.getUser(username, password);
-    if (user) {
-      user = {...user, password }
-      this.setState({ authenticatedUser: user });
-      console.log(`${user.firstName} is logged in!`)
-      // set cookie
-      Cookies.set('authenticatedUser', JSON.stringify(user));
+  signIn = async (emailAddress, password) => {
+    const user = await this.data.getUser(emailAddress, password);
+    if (user !== null) {
+      user.password = password;
+      user.emailAddress = user.Email;
+      this.setState(() => {
+        return {
+          authenticatedUser: user,
+        };
+      });
+      Cookies.set('authenticatedUser', JSON.stringify(user), { expires: 1 });
     }
     return user;
-  }
+  } 
+
 /*****************************
  * SIGN OUT FUNCTION
  *****************************/
   signOut = () => {
-    this.setState({ authenticatedUser: null });
-    Cookies.remove('authenticatedUser');
-  };
-
-/*****************************
- * VALIDATION
- *****************************/
-  parseValidationErrors = (errors) => {
-    const parsedErrors = errors.map(error => {
-      const parts = error.split('_');
+    this.setState(() => {
       return {
-        field: parts[0],
-        message: parts[1]
-      }
+        authenticatedUser: null,
+      };
     });
-    
-    return parsedErrors;
-  };
+    Cookies.remove('authenticatedUser');
+  }
 };
-
 
 export const Consumer = Context.Consumer;
 
@@ -87,5 +79,5 @@ export default function withContext(Component) {
         {context => <Component {...props} context={context} />}
       </Context.Consumer>
     );
-  };
-};
+  }
+}

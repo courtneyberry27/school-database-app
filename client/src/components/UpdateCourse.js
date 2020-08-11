@@ -1,123 +1,130 @@
-import React, {Component} from 'react';
+import React, { Component, Fragment } from 'react';
+import Form from './Form';
 
 export default class UpdateCourse extends Component {
-  state = {
-    courseId: '',
-    title: '',
-    firstName: '',
-    lastName: '',
-    description: '',
-    estimatedTime: '',
-    materialsNeeded: '',
-    errors:[]
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: '',
+      description: '',
+      estimatedTime: '',
+      materialsNeeded: '',
+      user: '',
+      courseId: '',
+      userId: '',
+      errors: []
+    }
+  }
 
 /***************************
  * DID MOUNT? SECTION
  ***************************/
   componentDidMount() {
-    const{ context } = this.props;
-    const{ authenticatedUser } = context;
-    const{ id } = this.props.match.params;
-
-    context.data.getCourseDetails(id)
-    .then(response => {
-      if (response) {
-        const user = response.course.User;
+    const { context } = this.props;
+    const authUser = this.props.context.authenticatedUser;
+    context.data.courseDetail(this.props.match.params.id).then(course => {
+      if (course) {
         this.setState({
-          courseId: id,
-          title: response.course.title,
-          courseByFirstName: user.firstName,
-          courseByLastName: user.lastName,
-          courseByEmailAddress: user.emailAddress,
-          description: response.course.description,
-          estimatedTime: response.course.estimatedTime,
-          materialsNeeded: response.course.materialsNeeded,
-          authenticatedUserEmailAddress: authenticatedUser.emailAddress
-        })
-      } else {
-        this.props.history.push('/notfound');
-      };
-
-      if (this.state.courseByEmailAddress !== this.state.authenticatedUserEmailAddress) {
-        this.props.history.push(`/forbidden`);
-      };
+          title: course.title,
+          description: course.description,
+          estimatedTime: course.estimatedTime,
+          materialsNeeded: course.materialsNeeded,
+          user: course.user,
+          courseId: course.id,
+          userId: course.userId
+        });
+      }
+      if (!authUser || authUser.Id !== this.state.user.id){
+        this.props.history.push('/forbidden')
+      }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
-      this.props.history.push('/error');
     });
-  };
+  }
+
 
   render() {
+    const { context } = this.props;
+
     const{ 
       title,
-      courseByFirstName,
-      courseByLastName,
       description,
       estimatedTime,
       materialsNeeded,
-      errors,
+      errors
      } = this.state;
     
     return (
       <div className="bounds course--detail">
         <h1>Update Course</h1>
-        <div>
-          {errors.length ? 
-            <React.Fragment>
-              <h2 className="validation--errors--label">Validation errors</h2>
-              <div className="validation-errors">
-                <ul>
-                  {errors.map((err, index) =>
-                    <li key={index}>{err}</li>
-                  )}
-                </ul> 
-              </div>
-            </React.Fragment>
-            : 
-            <hr />
-          }
-          <form onSubmit={this.update}>
-            <div className="grid-66">
-              <div className="course--header">
-                <h4 className="course--label">Course</h4>
-                <div>
-                  <input onChange={this.change} id="title" name="title" type="text" className="input-title course--title--input" placeholder="Course title..." value={title} />
+        <Form
+          cancel={this.cancel}
+          errors={errors}
+          submit={this.submit}
+          submitButtonText="Update Course"
+          elements={() => (
+            <Fragment>
+              <div className="grid-66">
+                <div className="course--header">
+                  <h4 className="course--label">Course</h4>
+                  <div>
+                    <input 
+                      id="title" 
+                      name="title" 
+                      type="text" 
+                      value={title}
+                      onChange={this.change} 
+                      className="input-title course--title--input" 
+                      placeholder="Course title..." />
+                  </div>
+                  <p>By {context.authenticatedUser.Name}</p>
                 </div>
-                <p>By {courseByFirstName} {courseByLastName}</p>
-              </div>
-
-              <div className="course--description">
-                <div>
-                  <textarea onChange={this.change} id="description" name="description" className="" placeholder="Course description..." value={description}></textarea>
+                <div className="course--description">
+                  <div>
+                    <textarea 
+                      id="description" 
+                      name="description" 
+                      value={description}
+                      onChange={this.change} 
+                      placeholder="Course description..."
+                      className="course--description" />
+                  </div> 
                 </div>
               </div>
-            </div>
-
-            <div className="grid-25 grid-right">
-              <div className="course--stats">
-                <ul className="course--stats--list">
-                  <li className="course--stats--list--item">
-                    <h4>Estimated Time</h4>
-                    <div>
-                      <input onChange={this.change}  id="estimatedTime" name="estimatedTime" type="text" className="course--time--input" placeholder="Hours" value={estimatedTime} />
-                    </div>
-                  </li>
-                  <li className="course--stats--list--item">
-                    <h4>Materials Needed</h4>
-                    <div>
-                      <textarea onChange={this.change} id="materialsNeeded" name="materialsNeeded" className="" placeholder="Please list each material..." value={materialsNeeded}></textarea></div>
-                  </li>
-                </ul>
+              <div className="grid-25 grid-right">
+                <div className="course--stats">
+                  <ul className="course--stats--list">
+                    <li className="course--stats--list--item">
+                      <h4>Estimated Time</h4>
+                      <div>
+                        <input 
+                          id="estimatedTime" 
+                          name="estimatedTime" 
+                          type="text"
+                          value={estimatedTime} 
+                          onChange={this.change} 
+                          className="course--time--input"                              
+                          placeholder="Hours" />
+                      </div>
+                    </li>
+                    <li className="course--stats--list--item">
+                      <h4>Materials Needed</h4>
+                      <div>
+                        <textarea
+                          id="materialsNeeded" 
+                          name="materialsNeeded"
+                          value={materialsNeeded}
+                          onChange={this.change} 
+                          placeholder="List materials..." 
+                        ></textarea>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
-
-            <div className="grid-100 pad-bottom">
-              <button className="button" type="submit">Update Course</button><button className="button button-secondary" onClick={this.cancel}>Cancel</button>
-            </div>
-          </form>
-        </div>
+            </Fragment>
+          )} />
       </div>
     );
   };
@@ -125,62 +132,63 @@ export default class UpdateCourse extends Component {
 /***************************
  * CHANGE FUNCTION
  ***************************/
-  change = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+change = (event) => {
+  const name = event.target.name;
+  const value = event.target.value;
 
-    this.setState(() => {
-      return {
-        [name]: value || ''
-      };
-    });
-  };
+  this.setState(() => {
+    return {
+      [name]: value
+    };
+  });
+}
 
 /***************************
  * UPDATE FUNCTION
  ***************************/
-  update = (e) => {
-    e.preventDefault();
-    const { context } = this.props;
-    const { emailAddress } = context.authenticatedUser;
-    const { password } = context.authenticatedUser;
+submit = () => {
+  const { context } = this.props;
+  const { emailAddress, password } = context.authenticatedUser;
+  const courseId = this.props.match.params.id;
+  const {
+    title,
+    description,
+    estimatedTime,
+    materialsNeeded,
+    user
+  } = this.state;
 
-    const {
-      courseId,
-      title,
-      description,
-      estimatedTime,
-      materialsNeeded,
-    } = this.state;
-
-    const updatedCourse = {
-      title,
-      description,
-      estimatedTime,
-      materialsNeeded
-    };
-
-    context.data.updateCourse(courseId, updatedCourse, emailAddress, password)
-    .then(errors => {
-      if (errors.errors) {
-        this.setState({ errors: errors.errors});
-      } else {
-        const id = this.state.courseId;
-        this.props.history.push(`/courses/${id}`);
-      };
-    })
-    .catch(err => {
-      console.log(err);
-      this.props.history.push('/error');
-    });
+  
+  const course = {
+    title,
+    description,
+    estimatedTime,
+    materialsNeeded,
+    user
   };
+  
+  context.data.updateCourse(courseId, course, emailAddress, password)
+  .then( errors => {
+    if (errors.length > 0){
+      this.setState({ errors });
+    } else if (errors.length === 0) {
+      this.props.history.push(`/courses/${courseId}`)
+    } else {
+      this.props.history.push('/forbidden')
+    }
+  })
+  .catch( err => {
+    console.log(err);
+    this.props.history.push('/error');
+  });
+}
 
 /***************************
  * CANCEL UPDATE FUNCTION
  ***************************/
   cancel = (e) => {
     e.preventDefault();
-    const id = this.state.courseId;
-    this.props.history.push(`/courses/${id}`);
+    const courseId = this.props.match.params.id;
+    this.props.history.push(`/courses/${courseId}`);
   };
 };
