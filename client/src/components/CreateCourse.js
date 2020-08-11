@@ -3,10 +3,10 @@ import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 import { Spring } from 'react-spring/renderprops';
 
-import ValidationErrors from './ValidationErrors';
-import { withAppContext } from './withAppContext';
+import ValidationErrors from '../Validation';
+import { withContext } from '../withContext';
 
-// Uses withAppContext to get access to this.props.context.
+// Uses withContext to get access to this.props.context.
 class CreateCourse extends Component {
   state = {
     title: null,
@@ -159,4 +159,4 @@ class CreateCourse extends Component {
   }
 }
 
-export default withAppContext(CreateCourse);
+export default withContext(CreateCourse);

@@ -3,8 +3,8 @@ import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 import { Spring } from 'react-spring/renderprops';
 
-import ValidationErrors from './ValidationErrors';
-import { withAppContext } from './withAppContext';
+import ValidationErrors from '../Validation';
+import { withContext } from '../withContext';
 
 // Gets the course when rendered, and updates when button is clicked. Redirects to forbidden if user not signed in.
 class UpdateCourse extends Component {
@@ -208,4 +208,4 @@ class UpdateCourse extends Component {
   }
 }
 
-export default withAppContext(UpdateCourse);
+export default withContext(UpdateCourse);
