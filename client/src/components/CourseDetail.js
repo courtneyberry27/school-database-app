@@ -1,98 +1,147 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import { Spring } from 'react-spring/renderprops';
+import React, { Component, Fragment } from 'react';
+import Markdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 
-import ActionsBar from './ActionsBar';
-
-class CourseDetail extends Component {
-  state = {
-    course: {},
-    id: this.props.match.params.id,
-    title: '',
-    description: '',
-    estimatedTime: '',
-    materialsNeeded: '',
-    name: ''
-  };
-
-  componentDidMount() {
-    this.getCourse();
+/*************************
+ * COURSE DETAIL CLASS
+ *************************/
+export default class CourseDetail extends Component {
+  
+  constructor(props) {
+    super(props)
+    this.state = {
+      title: '',
+      description: '',
+      estimatedTime: '',
+      materialsNeeded: '',
+      user: '',
+      authenticatedUser: '',
+      courseId: ''
+    }
+  }
+  
+/*************************
+ * DID MOUNT? SECTION
+ *************************/
+  async componentDidMount() {
+    const { context } = this.props;
+    const { id } = this.props.match.params;
+    context.data.courseDetail(id)
+    .then(response => {
+      this.setState({
+        title: response.title,
+        description: response.description,
+        estimatedTime: response.estimatedTime,
+        materialsNeeded: response.materialsNeeded,
+        user: response.user,
+        authenticatedUser: context.authenticatedUser,
+        courseId: id
+      })
+    })
+    .catch((err) => {
+      console.log(err);
+      this.props.history.push("/notfound");
+    });
   }
 
-  getCourse = () => {
-    const { id } = this.state;
-    const { history } = this.props;
 
-    axios
-      .get(`http://localhost:5000/api/courses/${id}`)
-      .then(response => {
-        this.setState({
-          course: response.data,
-          title: response.data.title,
-          description: response.data.description,
-          estimatedTime: response.data.estimatedTime,
-          materialsNeeded: response.data.materialsNeeded,
-          name: `${response.data.user.firstName} ${response.data.user.lastName}`
-        });
-      })
-      .catch(err => {
-        if (err.response.status === 500) {
-          history.push('/error');
-        } else {
-          history.push('/notfound');
-          console.log('Error fetching course', err);
-        }
-      });
-  };
 
   render() {
     const {
-      id,
-      course,
       title,
-      name,
-      description,
-      estimatedTime,
-      materialsNeeded
-    } = this.state;
-
+      courseId,
+      authenticatedUser,
+      user
+    } = this.state
+    
     return (
-      <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
-        {props => (
-          <div style={props}>
-            <ActionsBar id={id} course={course} withRouter={this.props} />
-            <div className="bounds course--detail">
-              <div className="grid-66">
-                <div className="course--header">
-                  <h4 className="course--label">Course</h4>
-                  <h3 className="course--title">{title}</h3>
-                  <p>By {name}</p>
-                </div>
-                <div className="course--description">
-                  <ReactMarkdown>{description}</ReactMarkdown>
-                </div>
-              </div>
-              <div className="grid-25 grid-right">
-                <div className="course--stats">
-                  <ul className="course--stats--list">
-                    <li className="course--stats--list--item">
-                      <h4>Estimated Time</h4>
-                      <h3>{estimatedTime}</h3>
-                    </li>
-                    <li className="course--stats--list--item">
-                      <h4>Materials Needed</h4>
-                      <ReactMarkdown>{materialsNeeded}</ReactMarkdown>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+      <div>
+        <div className="actions--bar">
+          <div className="bounds">
+            <div className="grid-100">
+            <span>
+                {authenticatedUser ? ( authenticatedUser.emailAddress === user.emailAddress ? (
+                    <Fragment>
+                      <Link
+                        className="button"
+                        to={`/courses/${courseId}/update`}>
+                        Update Course
+                      </Link>
+                      <Link
+                        className="button"
+                        onClick={this.deleteCourse}
+                        to={`/courses/delete/${courseId}`}>
+                        Delete Course
+                      </Link>
+                    </Fragment>
+                  ) : (
+                    <hr />
+                  )
+                ) : (
+                  <hr />
+                )}
+              </span>
+              <a className="button button-secondary" href="/">Return to List</a>
             </div>
           </div>
-        )}
-      </Spring>
-    );
+        </div>
+        <div className="bounds course--detail">
+          <div className="grid-66">
+            <div className="course--header">
+              <h4 className="course--label">Course</h4>
+              <h3 className="course--title">{title}</h3>
+              <p>By {this.state.user.firstName} {this.state.user.lastName}</p>
+            </div>
+            <div className="course--description">
+              <Markdown source={this.state.description} />
+            </div>
+          </div>
+          <div className="grid-25 grid-right">
+            <div className="course--stats">
+              <ul className="course--stats--list">
+                <li className="course--stats--list--item">
+                  <h4>Estimated Time</h4>
+                  <h3>{this.state.estimatedTime}</h3>
+                </li>
+                <li className="course--stats--list--item">
+                  <h4>Materials Needed</h4>
+                  <ul>
+                    <li>
+                      <Markdown source={this.state.materialsNeeded} />
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
-}
 
-export default CourseDetail;
+/*************************
+ * DELETE COURSE FUNCTION
+ *************************/
+  deleteCourse = () => {
+    const { context } = this.props;
+    const courseId = this.props.match.params.id;
+
+    if (context.authenticatedUser) {
+      const { emailAddress, password } = context.authenticatedUser;
+      context.data.deleteCourse(courseId, emailAddress, password)
+      .then(errors => {
+        if (errors && errors.length > 0){
+          this.setState({ errors });
+        } else {
+          this.props.history.push('/')
+        } 
+        })
+      .catch( err => {
+        console.log(err);
+        this.props.history.push('/error');
+      });
+    } else {
+      this.props.history.push('/forbidden')
+    }
+  } 
+} 

@@ -42,17 +42,21 @@ router.get('/users', middleware.authenticateUser, asyncHandler(async(req, res) =
 //POST /USERS
 router.post('/users', [
     check('firstName')
-        .exists()
-        .withMessage("Please provide value for 'firstName'"),
-    check('lastName')
-        .exists()
-        .withMessage("Please provide value for 'lastName'"),
-    check('emailAddress')
-        .exists()
-        .withMessage("Please provide value for 'emailAddress'"),
-    check('password')
-        .exists()
-        .withMessage("Please provide value for 'password'")
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a "First Name"'),
+  check('lastName')
+    .exists({ checknull: true, checkFalsy: true })
+    .withMessage('Please provide a "Last Name"'),
+  check('emailAddress')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "email"')
+    .isEmail()
+    .withMessage('Please provide a valid email address for "email"'),
+  check('password')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "password"')
+    .isLength({ min: 8, max: 20 })
+    .withMessage('Please provide a value for "password" that is between 8 and 20 characters in length'),
 ],asyncHandler(async(req, res) => { 
     const errors = validationResult(req);
     const user = req.body;
@@ -63,15 +67,19 @@ router.post('/users', [
         return res.status(400).json({ errors: errorMessages });
     }
 
-
+    
     //VALIDATE EMAIL IS UNIQUE
-    const uniqueEmail = await middleware.isUniqueEmail(user)
+    const uniqueEmail = await middleware.isUniqueEmail(user.emailAddress)
     if(!uniqueEmail) {
-        return res.status(400).json({ error: "Email already in use. please provide a unique email." });
+        console.log('notunique"');
+        res.status(400).json({ message: "Email already in use. Please provide a unique email." });
     }
 
     //HASH PASSWORD
-    user.password = bcryptjs.hashSync(user.password);
+    if(user.password) {
+        user.password = bcryptjs.hashSync(user.password);
+    }
+
     try {
         //ADD USER TO DATABASE
         await User.create(user);

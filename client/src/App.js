@@ -1,13 +1,14 @@
 //IMPORTS
-import React, { Component } from 'react';
-import { 
-  BrowserRouter,
+import React from 'react';
+import {
+  BrowserRouter as Router,
   Route,
-  Switch, 
+  Switch,
   Redirect
 } from 'react-router-dom';
 
-//FILE IMPORTS
+
+//MY FILE IMPORTS
 import Header from './components/Header'
 import UserSignUp from './components/UserSignUp';
 import UserSignIn from './components/UserSignIn';
@@ -17,59 +18,41 @@ import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
 import NotFound from './components/NotFound';
 import Courses from './components/Courses'
+import withContext from './Context';
 import PrivateRoute  from './PrivateRoute';
 import UnhandledError from './components/UnhandledError'
 import Forbidden from './components/Forbidden'
 
-//WITH CONTEXT IMPORT
-import { AuthProvider } from './Context';
+//WITH CONTEXT 
+const HeaderWithContext = withContext(Header);
+const UserSignUpWithContext = withContext(UserSignUp);
+const UserSignInWithContext = withContext(UserSignIn);
+const UserSignOutWithContext = withContext(UserSignOut);
+const CoursesWithContext = withContext(Courses);
+const CourseDetailWithContext = withContext(CourseDetail);
+const CreateCourseWithContext = withContext(CreateCourse);
+const UpdateCourseWithContext = withContext(UpdateCourse);
 
-// //USE WITH CONTEXT FOR ALL COMPONENTS (WithContext = "WITH CONTEXT")
-// const HeaderWithContext = withContext(Header);
-// const CoursesWithContext = withContext(Courses);
-// const UserSignInWithContext = withContext(UserSignIn);
-// const UserSignUpWithContext = withContext(UserSignUp);
-// const UserSignOutWithContext = withContext(UserSignOut);
-// const CourseDetailWithContext = withContext(CourseDetail);
-// const CreateCourseWithContext = withContext(CreateCourse);
-// const UpdateCourseWithContext = withContext(UpdateCourse);
 
-/*************************
- * ROUTES SECTION
- *************************/
-class App extends Component {
-  render() {
-    return (
-      <div className="root">
-        <div>
-          <AuthProvider>
-            <Header />
-            <Switch>
-              <Route exact path="/" component={Courses} />
-              <PrivateRoute
-                exact
-                path="/courses/:id/update"
-                component={UpdateCourse}
-              />
-              <PrivateRoute
-                exact
-                path="/courses/create"
-                component={CreateCourse}
-              />
-              <Route exact path="/courses/:id" component={CourseDetail} />
-              <Route exact path="/signin" component={UserSignIn} />
-              <Route exact path="/signup" component={UserSignUp} />
-              <Route exact path="/signout" component={UserSignOut} />
-              <Route exact path="/forbidden" component={Forbidden} />
-              <Route exact path="/notfound" component={NotFound} />
-              <Route exact path="/error" component={UnhandledError} />
-              <Route render={() => <Redirect to="/notfound" />} />
-            </Switch>
-          </AuthProvider>
-        </div>
-      </div>
-    );
-  }
-}
+export default () => (
+  <Router>
+    <div>
+      <HeaderWithContext />
 
-export default App;
+      <Switch>
+        <Route exact path="/" render={ () => <Redirect to="/courses"/> } />
+        <Route exact path="/courses" component={CoursesWithContext} />
+        <PrivateRoute path="/courses/create" component={CreateCourseWithContext} />
+        <PrivateRoute path="/courses/:id/update" component={UpdateCourseWithContext} />
+        <Route path="/courses/:id" component={CourseDetailWithContext} />
+        <Route path="/signin" component={UserSignInWithContext} />
+        <Route path="/signup" component={UserSignUpWithContext} />
+        <Route path="/signout" component={UserSignOutWithContext} />
+        <Route path="/error" component={UnhandledError} />
+        <Route path='/forbidden' component={Forbidden} />
+        <Route path='/notfound' component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </div>
+  </Router>
+);

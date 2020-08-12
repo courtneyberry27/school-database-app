@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
 
-// Per instructions, App.js routes to /signout, then this redirects to main courses page.
-const UserSignOut = () => {
-  return <Redirect to="/" />;
-};
+/*************************
+ * USER SIGN OUT CLASS
+ *************************/
+export default ({ context }) => {
+  useEffect(() =>context.actions.signOut());
 
-export default UserSignOut;
+  return (
+    <Redirect to="/" />
+  );
+}

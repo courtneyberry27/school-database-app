@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles/global.css';
+
+import { Provider } from './Context';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { AuthProvider } from './Context';
 
 ReactDOM.render(
-  <AuthProvider>
+  <Provider>
     <App />
-  </AuthProvider>,
+  </Provider>,
   document.getElementById('root')
 );
 
@@ -16,3 +17,5 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+ 
