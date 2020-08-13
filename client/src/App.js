@@ -22,6 +22,7 @@ import withContext from './Context';
 import PrivateRoute  from './PrivateRoute';
 import UnhandledError from './components/UnhandledError'
 import Forbidden from './components/Forbidden'
+import EmailInUse from './components/EmailInUse';
 
 //WITH CONTEXT 
 const HeaderWithContext = withContext(Header);
@@ -50,6 +51,7 @@ export default () => (
         <Route path="/signout" component={UserSignOutWithContext} />
         <Route path="/error" component={UnhandledError} />
         <Route path='/forbidden' component={Forbidden} />
+        <Route path='/email-in-use' component={EmailInUse} />
         <Route path='/notfound' component={NotFound} />
         <Route component={NotFound} />
       </Switch>

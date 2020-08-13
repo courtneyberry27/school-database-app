@@ -33,7 +33,7 @@ export default (props) => {
       <ErrorsDisplay errors={errors} />
       <form onSubmit={handleSubmit}>
         {elements()}
-        <div className="pad-bottom">
+        <div className="grid-100 pad-bottom">
           <button className="button" type="submit">{submitButtonText}</button>
           <button className="button button-secondary" onClick={handleCancel}>Cancel</button>
         </div>
@@ -48,7 +48,7 @@ export default (props) => {
 function ErrorsDisplay({ errors }) {
   let errorsDisplay = null;
 
-  if (errors.length) {
+  if (errors.length && typeof errors !== 'string') {
     errorsDisplay = (
       <div>
         <h2 className="validation--errors--label">Validation Errors:</h2>
@@ -59,7 +59,18 @@ function ErrorsDisplay({ errors }) {
         </div>
       </div>
     );
-  }
+  } else if(errors.length && typeof errors === 'string') {
+    errorsDisplay = (
+        <div>
+            <h2 className="validation--errors--label">Validation errors</h2>
+            <div className="validation-errors">
+                <ul>
+                    <li key={1}>{errors}</li>
+                </ul>
+            </div>
+        </div>
+    );  
+}
 
   return errorsDisplay;
 }

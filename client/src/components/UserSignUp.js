@@ -105,6 +105,7 @@ export default class UserSignUp extends Component {
       lastName,
       emailAddress,
       password,
+      confirmPassword
     } = this.state;
 
     const user = {
@@ -114,21 +115,29 @@ export default class UserSignUp extends Component {
       password,
     };
     
-    context.data.createUser(user).then( errors => {
-      if (errors && errors.length > 0){
-        this.setState({ errors });
-      } else {
-        context.actions.signIn(emailAddress, password)
-        .then(() => {
-          this.props.history.push('/')
-        });
-      }
-    })
-    .catch( err => {
-      console.log(err);
-      this.props.history.push('/error');
-    });
-  }
+    if(confirmPassword === password) {
+      context.data.createUser(user)
+          .then(errors => {
+              if(errors.length) {
+                  this.setState({ errors });
+              }
+              else {
+                  console.log(`${emailAddress} is signed up!`);
+                  context.actions.signIn(emailAddress, password);
+                  this.props.history.push('/signin');
+              }
+          })
+          //handle rejected promise
+          .catch( err => { 
+              console.log('Oops! Email already in Use.', err);
+              this.props.history.push('/email-in-use'); 
+          });   
+    }  else {
+      this.setState({
+        errors: 'Passwords do not match.'
+      });
+    }  
+};
 
 /*************************
  * CANCEL FUNCTION
