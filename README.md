@@ -18,7 +18,7 @@ Start the api portion of application.
 
 npm start
 
-Then navigate to the client folder, and install the dependencies using npm.
+Then, in another terminal, navigate to the client folder, and install the dependencies using npm.
 
 cd api
 npm install
