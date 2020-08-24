@@ -28,6 +28,7 @@ export default (props) => {
     cancel();
   }
 
+  //format
   return (
     <div>
       <ErrorsDisplay errors={errors} />
@@ -46,8 +47,10 @@ export default (props) => {
  * ERRORS DISPLAY
  *************************/
 function ErrorsDisplay({ errors }) {
+  //initially null
   let errorsDisplay = null;
 
+  //if errors not string
   if (errors.length && typeof errors !== 'string') {
     errorsDisplay = (
       <div>
@@ -59,6 +62,7 @@ function ErrorsDisplay({ errors }) {
         </div>
       </div>
     );
+    //if errors string
   } else if(errors.length && typeof errors === 'string') {
     errorsDisplay = (
         <div>
