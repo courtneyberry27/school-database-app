@@ -25,6 +25,8 @@ export default class UpdateCourse extends Component {
   componentDidMount() {
     const { context } = this.props;
     const authUser = this.props.context.authenticatedUser;
+    
+    //load when mounted the details
     context.data.courseDetail(this.props.match.params.id).then(course => {
       if (course) {
         this.setState({
@@ -37,6 +39,7 @@ export default class UpdateCourse extends Component {
           userId: course.userId
         });
       }
+      
       //FORBIDDEN 
       if (!authUser || authUser.Id !== this.state.user.id){
         this.props.history.push('/forbidden')
@@ -145,6 +148,7 @@ export default class UpdateCourse extends Component {
     const name = event.target.name;
     const value = event.target.value;
 
+    //changes old to new value
     this.setState(() => {
       return {
         [name]: value
@@ -176,12 +180,16 @@ export default class UpdateCourse extends Component {
       user
     };
     
+    //with auth update course 
     context.data.updateCourse(courseId, course, emailAddress, password)
     .then( errors => {
+      //if errors
       if (errors.length > 0){
         this.setState({ errors });
+      //if no errors
       } else if (errors.length === 0) {
         this.props.history.push(`/courses/${courseId}`)
+      //not found
       } else {
         this.props.history.push('/notfound')
       }
@@ -197,6 +205,7 @@ export default class UpdateCourse extends Component {
  *************************/
   cancel = () => {
     const courseId = this.props.match.params.id;
+    //pushes back to course detail
     this.props.history.push(`/courses/${courseId}`);
   }
 }
