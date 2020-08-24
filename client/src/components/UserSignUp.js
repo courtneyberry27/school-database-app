@@ -25,6 +25,7 @@ export default class UserSignUp extends Component {
       errors,
     } = this.state;
 
+    //format
     return (
       <div className="bounds">
         <div className="grid-33 centered signin">
@@ -88,6 +89,7 @@ export default class UserSignUp extends Component {
     const name = event.target.name;
     const value = event.target.value;
 
+    //change old value to new
     this.setState(() => {
       return {
         [name]: value
@@ -115,13 +117,17 @@ export default class UserSignUp extends Component {
       password,
     };
     
+    //check if matching passwords
     if(confirmPassword === password) {
+      //create user
       context.data.createUser(user)
           .then(errors => {
               if(errors.length) {
+                //if errors with sign up
                   this.setState({ errors });
               }
               else {
+                //if no errors
                   console.log(`${emailAddress} is signed up!`);
                   context.actions.signIn(emailAddress, password);
                   this.props.history.push('/signin');
