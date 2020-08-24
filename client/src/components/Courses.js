@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import "../App.css";
 import Course from "./Course";
-// import { Link } from "react-router-dom";
-// import { withRouter } from "react-router";
 import Notfound from './NotFound';
 
 /*************************
@@ -29,7 +27,7 @@ export default class Courses extends Component  {
   render() {
     let courses;
 
-    //FOR EACH COURSE
+    //FOR EACH COURSE, USE COURSE FORMAT
     if(this.state.courses.length > 0) {
       courses = this.state.courses.map((course) => 
         <Course
