@@ -30,6 +30,7 @@ export default class CreateCourse extends Component {
   componentDidMount() {
     const { context } = this.props;
     this.setState(() => {
+      //get auth 
       return {
         userId: context.authenticatedUser.Id,
         name: context.authenticatedUser.Name
@@ -46,6 +47,7 @@ export default class CreateCourse extends Component {
       errors,
     } = this.state;
     
+    //format
     return(
       <div className="bounds course--detail">
         <h1>Create Course</h1>
@@ -127,6 +129,7 @@ export default class CreateCourse extends Component {
     const name = event.target.name;
     const value = event.target.value;
 
+    //changes current value to new value
     this.setState(() => {
       return {
         [name]: value
@@ -148,6 +151,7 @@ export default class CreateCourse extends Component {
       userId
     } = this.state;
 
+    //each course info
     const course = {
       title,
       description,
@@ -156,6 +160,7 @@ export default class CreateCourse extends Component {
       userId
     };
     
+    //uses createCourse() with auth only
     context.data.createCourse(course, emailAddress, password).then( errors => {
       if (errors && errors.length > 0){
         this.setState({ errors });
@@ -164,6 +169,7 @@ export default class CreateCourse extends Component {
       }
     })
     .catch( err => {
+      //error occurred
       console.log(err);
       this.props.history.push('/error');
     });
@@ -173,6 +179,7 @@ export default class CreateCourse extends Component {
  * CANCEL FUNCTION
  *************************/
   cancel = () => {
+    //go back to home page
     this.props.history.push('/');
   }
 }
