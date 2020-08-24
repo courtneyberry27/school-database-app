@@ -28,6 +28,7 @@ export default class CourseDetail extends Component {
     const { id } = this.props.match.params;
     context.data.courseDetail(id)
     .then(response => {
+      //is found
       this.setState({
         title: response.title,
         description: response.description,
@@ -39,6 +40,7 @@ export default class CourseDetail extends Component {
       })
     })
     .catch((err) => {
+      //not found
       console.log(err);
       this.props.history.push("/notfound");
     });
@@ -126,21 +128,25 @@ export default class CourseDetail extends Component {
     const { context } = this.props;
     const courseId = this.props.match.params.id;
 
+    //if autorized
     if (context.authenticatedUser) {
       const { emailAddress, password } = context.authenticatedUser;
       context.data.deleteCourse(courseId, emailAddress, password)
       .then(errors => {
+        //if errors
         if (errors && errors.length > 0){
           this.setState({ errors });
-        } else {
+        } else { //no errors push to home
           this.props.history.push('/')
         } 
         })
       .catch( err => {
+        //error occurred
         console.log(err);
         this.props.history.push('/error');
       });
     } else {
+      //not authorized
       this.props.history.push('/forbidden')
     }
   } 
