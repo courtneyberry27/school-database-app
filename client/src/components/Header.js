@@ -8,6 +8,7 @@ const Header = (props) => {
   const { context } = props;
   const authUser = context.authenticatedUser;
   
+  //format
   return (
     <div className="header">
       <div className="bounds">
